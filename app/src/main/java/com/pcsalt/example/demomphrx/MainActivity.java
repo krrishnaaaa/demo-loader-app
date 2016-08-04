@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -22,6 +24,8 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private RadioGroup rgUrls;
+    private ProgressBar progressBar;
+    private LinearLayout controls;
     private static final long UPDATE_AFTER = 60 * 60 * 1000;
     private static final String TAG = "MainActivity";
     private DataSource dataSource;
@@ -46,12 +50,15 @@ public class MainActivity extends AppCompatActivity {
         dataSource = new DataSource(MainActivity.this);
 
         rgUrls = (RadioGroup) findViewById(R.id.rg_urls);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
+        controls = (LinearLayout) findViewById(R.id.controls);
     }
 
     public void loadUrl(View view) {
         int checkedBtnId = rgUrls.getCheckedRadioButtonId();
         switch (checkedBtnId) {
             case R.id.rb_url1:
+                handleUi(true);
                 if (dataSource.exists(getString(R.string.url1))) {
                     openDisplayActivity(getString(R.string.url1));
                 } else {
@@ -90,5 +97,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
         intent.putExtra("selectedUrl", selectedWebUrl);
         startActivity(intent);
+        handleUi(false);
+    }
+
+    private void handleUi(boolean isLoading) {
+        controls.setVisibility(isLoading ? View.INVISIBLE : View.VISIBLE);
+        progressBar.setVisibility(isLoading ? View.VISIBLE : View.INVISIBLE);
     }
 }
