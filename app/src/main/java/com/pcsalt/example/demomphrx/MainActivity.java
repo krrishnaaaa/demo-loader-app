@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout controls;
     private static final long UPDATE_AFTER = 60 * 60 * 1000;
     private static final String TAG = "MainActivity";
+    private NetworkRepo networkRepo;
     private DataSource dataSource;
 
     @Override
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dataSource = new DataSource(MainActivity.this);
+        networkRepo = NetworkClient.getClient().create(NetworkRepo.class);
 
         rgUrls = (RadioGroup) findViewById(R.id.rg_urls);
         progressBar = (ProgressBar) findViewById(R.id.progress);
@@ -66,13 +68,17 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.rb_url2:
+                handleUi(true);
+                if (dataSource.exists(getString(R.string.url2))) {
+                    openDisplayActivity(getString(R.string.url2));
+                } else {
+                    getFromUrl2();
+                }
                 break;
         }
     }
 
     private void getFromUrl1() {
-        NetworkRepo networkRepo = NetworkClient.getClient().create(NetworkRepo.class);
-
         Call<List<WebUrl>> call = networkRepo.getFromUrl1();
         call.enqueue(new Callback<List<WebUrl>>() {
             @Override
@@ -83,6 +89,27 @@ public class MainActivity extends AppCompatActivity {
                 long insertId = dataSource.insertWebUrl(response.body().get(0), getString(R.string.url1));
                 Log.d(TAG, "insertId: " + insertId);
                 openDisplayActivity(getString(R.string.url1));
+            }
+
+            @Override
+            public void onFailure(Call<List<WebUrl>> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void getFromUrl2() {
+        Call<List<WebUrl>> call = networkRepo.getFromUrl2();
+        call.enqueue(new Callback<List<WebUrl>>() {
+            @Override
+            public void onResponse(Call<List<WebUrl>> call, Response<List<WebUrl>> response) {
+                Log.d(TAG, "onResponse: " + response.body().get(0).getWebUrl());
+                Log.d(TAG, "onResponse: " + response.body().get(0).getDescription());
+
+                long insertId = dataSource.insertWebUrl(response.body().get(0), getString(R.string.url2));
+                Log.d(TAG, "insertId: " + insertId);
+                openDisplayActivity(getString(R.string.url2));
             }
 
             @Override
