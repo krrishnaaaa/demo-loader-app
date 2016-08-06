@@ -3,11 +3,13 @@ package com.pcsalt.example.demomphrx;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pcsalt.example.demomphrx.db.DataSource;
@@ -50,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
         dataSource = new DataSource(MainActivity.this);
         networkRepo = NetworkClient.getClient().create(NetworkRepo.class);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        TextView textViewTitle = (TextView) toolbar.findViewById(R.id.text_view_title);
+        textViewTitle.setText(R.string.app_name);
 
         rgUrls = (RadioGroup) findViewById(R.id.rg_urls);
         progressBar = (ProgressBar) findViewById(R.id.progress);
