@@ -1,10 +1,13 @@
 package com.pcsalt.example.demomphrx;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -19,8 +22,9 @@ import com.pcsalt.example.demomphrx.model.WebUrl;
 public class DisplayActivity extends AppCompatActivity {
 
     private static final String TAG = "DisplayActivity";
-    WebView webView;
+    private WebView webView;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +65,7 @@ public class DisplayActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 Log.i(TAG, "Finished loading URL: " + url);
-                webView.loadUrl("javascript:MyApp.resize(document.body.getBoundingClientRect().height)");
+                view.loadUrl("javascript:MyApp.resize(document.body.getBoundingClientRect().height)");
             }
 
             @JavascriptInterface
@@ -77,6 +81,15 @@ public class DisplayActivity extends AppCompatActivity {
 
         row1.setText(webUrl.getDescription());
         row2.setText(webUrl.getDescription());
+        adjustTextSize(row1);
         webView.loadUrl(webUrl.getWebUrl());
+    }
+
+    private void adjustTextSize(@NonNull TextView textView) {
+        if (textView.getText().length() > 200) {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
+        } else {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        }
     }
 }
