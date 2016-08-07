@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup rgUrls;
     private ProgressBar progressBar;
     private LinearLayout controls;
-    private static final long UPDATE_AFTER = 60 * 60 * 1000;
     private static final String TAG = "MainActivity";
     private NetworkRepo networkRepo;
     private DataSource dataSource;
