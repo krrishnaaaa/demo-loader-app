@@ -1,0 +1,10 @@
+[
+  {
+    "webUrl": "https://www.google.co.in",
+    "description": "As a mobile developer, I was sad to find nothing native that supports auto resizing. My searches did not turn up anything that worked for me and in the end, I spent the better half of my weekend and created my own auto resize text view. I will post the code here and hopefully it will be useful for someone else.This class uses a static layout with the text paint of the original text view to measure the height. From there, I step down by 2 font pixels and remeasure until I have a size that fits. At the end, if the text still does not fit, I append an ellipsis. I had requirements to animate the text and reuse views and this seems to work well on the devices I have and seems to run fast enough for me."
+  },
+  {
+    "webUrl": "https://www.pcsalt.com",
+    "description": "PCSalt Homepage"
+  }
+]

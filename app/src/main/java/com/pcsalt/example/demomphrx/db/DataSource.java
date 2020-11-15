@@ -4,10 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.pcsalt.example.demomphrx.model.WebUrl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class handles the database operations, like insert, get and check if data is available.
@@ -20,11 +24,11 @@ public class DataSource {
     /**
      * Instance of SQLiteOpenHelper.
      */
-    private DbHelper dbHelper;
+    private final DbHelper dbHelper;
     /**
      * String array, which contains all the columns of the database
      */
-    private String[] allColumns = {DbHelper.ID, DbHelper.WEB_URL, DbHelper.DESCRIPTION};
+    private final String[] allColumns = {DbHelper.ID, DbHelper.WEB_URL, DbHelper.DESCRIPTION};
 
     /**
      * Constructor to create instance of the database. By calling this constructor, a database is
@@ -60,7 +64,8 @@ public class DataSource {
      * @return true if data is available, false otherwise
      */
     public boolean exists(String webUrlId) {
-        return getWebUrl(webUrlId) != null;
+        List<WebUrl> webUrlList = getWebUrl(webUrlId);
+        return webUrlList != null && !webUrlList.isEmpty();
     }
 
     /**
@@ -86,15 +91,18 @@ public class DataSource {
      * @return {@link WebUrl} instance containing the webUrl and description, null if data is not found
      */
     @Nullable
-    public WebUrl getWebUrl(String selectedUrlId) {
+    public List<WebUrl> getWebUrl(String selectedUrlId) {
+        List<WebUrl> webUrlList = new ArrayList<>();
         Cursor cursor = database.query(DbHelper.TABLE, allColumns, DbHelper.WEB_URL_ID + " = \"" + selectedUrlId + "\"", null, null, null, null);
-        if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
-            WebUrl webUrl = new WebUrl();
-            webUrl.setWebUrl(cursor.getString(cursor.getColumnIndex(DbHelper.WEB_URL)));
-            webUrl.setDescription(cursor.getString(cursor.getColumnIndex(DbHelper.DESCRIPTION)));
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                WebUrl webUrl = new WebUrl();
+                webUrl.setWebUrl(cursor.getString(cursor.getColumnIndex(DbHelper.WEB_URL)));
+                webUrl.setDescription(cursor.getString(cursor.getColumnIndex(DbHelper.DESCRIPTION)));
+                webUrlList.add(webUrl);
+            }
             cursor.close();
-            return webUrl;
         }
-        return null;
+        return webUrlList;
     }
 }

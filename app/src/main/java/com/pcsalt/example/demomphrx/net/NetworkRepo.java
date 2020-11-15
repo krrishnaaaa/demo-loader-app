@@ -17,7 +17,7 @@ public interface NetworkRepo {
      *
      * @return Call instance
      */
-    @GET("HjRRSIl")
+    @GET("ceFaiNmtgy")
     Call<List<WebUrl>> getFromUrl1();
 
     /**
@@ -25,6 +25,6 @@ public interface NetworkRepo {
      *
      * @return Call instance
      */
-    @GET("VJ7L0YDVl")
+    @GET("cfqWBPkAte")
     Call<List<WebUrl>> getFromUrl2();
 }

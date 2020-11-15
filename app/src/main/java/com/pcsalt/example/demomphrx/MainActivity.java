@@ -2,8 +2,6 @@ package com.pcsalt.example.demomphrx;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -11,6 +9,10 @@ import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.pcsalt.example.demomphrx.db.DataSource;
 import com.pcsalt.example.demomphrx.model.WebUrl;
@@ -86,40 +88,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void getFromUrl1() {
         Call<List<WebUrl>> call = networkRepo.getFromUrl1();
-        call.enqueue(new Callback<List<WebUrl>>() {
-            @Override
-            public void onResponse(Call<List<WebUrl>> call, Response<List<WebUrl>> response) {
-                Log.d(TAG, "onResponse: " + response.body().get(0).getWebUrl());
-                Log.d(TAG, "onResponse: " + response.body().get(0).getDescription());
-
-                long insertId = dataSource.insertWebUrl(response.body().get(0), getString(R.string.url1));
-                Log.d(TAG, "insertId: " + insertId);
-                openDisplayActivity(getString(R.string.url1));
-            }
-
-            @Override
-            public void onFailure(Call<List<WebUrl>> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t);
-                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        handleResponse(call, getString(R.string.url1));
     }
 
     private void getFromUrl2() {
         Call<List<WebUrl>> call = networkRepo.getFromUrl2();
+        handleResponse(call, getString(R.string.url2));
+    }
+
+    private void handleResponse(Call<List<WebUrl>> call, String url) {
         call.enqueue(new Callback<List<WebUrl>>() {
             @Override
-            public void onResponse(Call<List<WebUrl>> call, Response<List<WebUrl>> response) {
-                Log.d(TAG, "onResponse: " + response.body().get(0).getWebUrl());
-                Log.d(TAG, "onResponse: " + response.body().get(0).getDescription());
+            public void onResponse(@NonNull Call<List<WebUrl>> call, @NonNull Response<List<WebUrl>> response) {
+                if (response.body() != null) {
+                    for (WebUrl webUrl : response.body()) {
+                        Log.d(TAG, "onResponse: " + webUrl.getWebUrl());
+                        Log.d(TAG, "onResponse: " + webUrl.getDescription());
 
-                long insertId = dataSource.insertWebUrl(response.body().get(0), getString(R.string.url2));
-                Log.d(TAG, "insertId: " + insertId);
-                openDisplayActivity(getString(R.string.url2));
+                        long insertId = dataSource.insertWebUrl(webUrl, url);
+                        Log.d(TAG, "insertId: " + insertId);
+                    }
+                    openDisplayActivity(url);
+                }
             }
 
             @Override
-            public void onFailure(Call<List<WebUrl>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<WebUrl>> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
                 Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }

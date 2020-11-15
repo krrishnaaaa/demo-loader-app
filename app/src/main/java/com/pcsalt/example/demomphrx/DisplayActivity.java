@@ -2,12 +2,7 @@ package com.pcsalt.example.demomphrx;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -16,8 +11,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.pcsalt.example.demomphrx.db.DataSource;
 import com.pcsalt.example.demomphrx.model.WebUrl;
+
+import java.util.List;
 
 public class DisplayActivity extends AppCompatActivity {
 
@@ -45,13 +47,15 @@ public class DisplayActivity extends AppCompatActivity {
         // opening database connection
         dataSource.open();
         // getting WebUrl information from the database
-        WebUrl webUrl = dataSource.getWebUrl(getIntent().getStringExtra("selectedUrl"));
-        Log.d(TAG, "webUrl: " + webUrl.getWebUrl());
-        Log.d(TAG, "description: " + webUrl.getDescription());
+        List<WebUrl> webUrlList = dataSource.getWebUrl(getIntent().getStringExtra("selectedUrl"));
+        if (webUrlList == null || webUrlList.isEmpty()) {
+            Toast.makeText(this, "No url found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        displayUrlChooser(webUrlList);
         dataSource.close();
 
-        TextView row1 = (TextView) findViewById(R.id.text_view_row1);
-        TextView row2 = (TextView) findViewById(R.id.text_view_row2);
+
         webView = (WebView) findViewById(R.id.web_view);
 
         // changing WebSettings for the webView to enable the change of height of WebView as per
@@ -97,22 +101,24 @@ public class DisplayActivity extends AppCompatActivity {
             }
         });
 
-        row1.setText(webUrl.getDescription());
-        row2.setText(webUrl.getDescription());
-        adjustTextSize(row1);
-        webView.loadUrl(webUrl.getWebUrl());
     }
 
-    /**
-     * This methods checks the length of content in the TextView, if greater than 200 sets to 8sp,
-     * else set it to 14sp.
-     * @param textView TextView instance to resize the text size
-     */
-    private void adjustTextSize(@NonNull TextView textView) {
-        if (textView.getText().length() > 200) {
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8);
-        } else {
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+    private void displayUrlChooser(List<WebUrl> webUrlList) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String[] items = new String[webUrlList.size()];
+        int i = 0;
+        for (WebUrl url : webUrlList) {
+            items[i++] = url.getWebUrl();
         }
+        builder.setItems(items, (dialogInterface, which) -> {
+            TextView row1 = (TextView) findViewById(R.id.text_view_row1);
+            TextView row2 = (TextView) findViewById(R.id.text_view_row2);
+            WebUrl webUrl = webUrlList.get(which);
+            row1.setText(webUrl.getDescription());
+            row2.setText(webUrl.getDescription());
+            webView.loadUrl(webUrl.getWebUrl());
+            dialogInterface.dismiss();
+        });
+        builder.create().show();
     }
 }

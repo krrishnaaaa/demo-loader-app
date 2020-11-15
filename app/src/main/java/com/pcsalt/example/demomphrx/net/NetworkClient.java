@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * received from the API and place them in proper model objects.
  */
 public class NetworkClient {
-    private static final String BASE_URL = "http://beta.json-generator.com/api/json/get/";
+    private static final String BASE_URL = "https://www.json-generator.com/api/json/get/";
     private static Retrofit retrofit = null;
 
     /**
